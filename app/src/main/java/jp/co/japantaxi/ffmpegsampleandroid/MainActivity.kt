@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import com.arthenica.mobileffmpeg.FFmpeg
+import kotlinx.android.synthetic.main.activity_main.*
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
@@ -11,19 +13,23 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        FFmpeg.execute("-version")
-        val rc = FFmpeg.getLastReturnCode()
-        val output = FFmpeg.getLastCommandOutput()
+        button.setOnClickListener {
+            val filename = filesDir.path + File.separator + "1574239826605.wav"
 
-        when (rc) {
-            FFmpeg.RETURN_CODE_SUCCESS -> {
-                Log.i("FFmpeg", "Success!")
-            }
-            FFmpeg.RETURN_CODE_CANCEL -> {
-                Log.e("FFmpeg", output)
-            }
-            else -> {
-                Log.e("FFmpeg", output)
+            FFmpeg.execute("-i $filename -af volumedetect -f null NULL")
+            val rc = FFmpeg.getLastReturnCode()
+            val output = FFmpeg.getLastCommandOutput()
+
+            when (rc) {
+                FFmpeg.RETURN_CODE_SUCCESS -> {
+                    text.text = "FFmpeg Success!\n $output"
+                }
+                FFmpeg.RETURN_CODE_CANCEL -> {
+                    text.text = "FFmpeg Cancel\n $output"
+                }
+                else -> {
+                    text.text = "FFmpeg Error\n $output"
+                }
             }
         }
     }
